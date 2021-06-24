@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import vabiss.task.entities.Account;
 import vabiss.task.enums.EnumExceptionsMessage;
@@ -31,10 +35,38 @@ public class DaoAccount {
     AccountDetailsService accountDetailsService;
 
     @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JwtUtil jwtTokenUtil;
+
+
+    @Autowired
     RepoAccount repoAccount;
 
     @Autowired
     JwtUtil jwtUtil;
+
+    public Response login(RequestLoginOrRegistry requestLoginOrRegistry) {
+        if (requestLoginOrRegistry.getUsername().length() != 0 && requestLoginOrRegistry.getPassword().length() != 0) {
+            UserDetails userDetails = accountDetailsService.loadUserByUsername(requestLoginOrRegistry.getUsername());
+            try {
+                if (userDetails.getUsername().equals(requestLoginOrRegistry.getUsername())) {
+                    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                            requestLoginOrRegistry.getUsername(),
+                            encryptUtils.encrypt(requestLoginOrRegistry.getPassword()))
+                    );
+                }
+            } catch (BadCredentialsException e) {
+                throw new WrongPasswordException(EnumExceptionsMessage.USER_WRONG_USERNAME_OR_PASSWORD.getMessage());
+            }
+            final String jwt = jwtTokenUtil.generateToken(userDetails);
+
+            return new Response().setResponse(jwt).setCode(201);
+        } else {
+            throw new EmptyException(EnumExceptionsMessage.USERNAME_OR_PASSWORD_EMPTY.getMessage());
+        }
+    }
 
     public Response register(RequestLoginOrRegistry requestLoginOrRegistry) {
         if (requestLoginOrRegistry.getUsername().length() != 0

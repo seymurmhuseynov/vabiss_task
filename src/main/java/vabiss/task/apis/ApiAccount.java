@@ -17,6 +17,11 @@ public class ApiAccount {
     @Autowired
     DaoAccount daoAccount;
 
+    @PostMapping(value = "/signup", produces = "application/json")
+    public Response login(@RequestBody @Valid @NotNull RequestLoginOrRegistry requestLogin) {
+        return daoAccount.login(requestLogin);
+    }
+
     @PostMapping(value = "/registry", produces = "application/json")
     public Response registry(@RequestBody @Valid @NotNull RequestLoginOrRegistry requestRegistry) {
         return daoAccount.register(requestRegistry);
