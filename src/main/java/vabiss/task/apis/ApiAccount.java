@@ -26,5 +26,11 @@ public class ApiAccount {
     public Response registry(@RequestBody @Valid @NotNull RequestLoginOrRegistry requestRegistry) {
         return daoAccount.register(requestRegistry);
     }
+
+    @GetMapping(value = "/me", produces = "application/json")
+    public Response myAccount() {
+        return daoAccount.myAccount();
+    }
+
 }
 

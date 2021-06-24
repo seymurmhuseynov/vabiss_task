@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import vabiss.task.entities.Account;
 import vabiss.task.enums.EnumExceptionsMessage;
 import vabiss.task.exceptions.EmptyException;
+import vabiss.task.exceptions.TokenNotFoundException;
 import vabiss.task.exceptions.WrongMailFormatException;
 import vabiss.task.exceptions.WrongPasswordException;
 import vabiss.task.model.RequestLoginOrRegistry;
@@ -90,6 +91,16 @@ public class DaoAccount {
             }
         } else {
             throw new EmptyException(EnumExceptionsMessage.USERNAME_OR_PASSWORD_EMPTY.getMessage());
+        }
+    }
+
+    public Response myAccount() {
+        Account account = accountDetailsService.localSelectUsers();
+        Optional<Account> myAccount = repoAccount.findById(account.getId());
+        if (myAccount.isPresent()) {
+            return new Response().setResponse(myAccount);
+        } else {
+            throw new TokenNotFoundException(EnumExceptionsMessage.TOKEN_NOT_FOUND.getMessage());
         }
     }
 
