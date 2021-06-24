@@ -5,7 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <include file="db.changelog/create_user_table.xml"/>
-    <include file="db.changelog/rename_table_user_to_users.xml"/>
-
+        <changeSet author="liquibase-docs" id="renameTable-example">
+            <renameTable newTableName="users"
+                         oldTableName="user"
+                         schemaName="test"/>
+        </changeSet>
 </databaseChangeLog>
